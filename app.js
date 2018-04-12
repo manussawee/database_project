@@ -49,6 +49,12 @@ app.use(function (req, res, next) {
   next(err);
 });
 
+app.set('trust proxy',1);
+app.use(cookieSession({
+  name:'session',
+  keys:['userID', 'isLogin'],
+  maxAge: 24 * 60 * 60 * 1000
+}));
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
