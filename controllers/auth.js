@@ -31,7 +31,7 @@ router.get('/check', function (req, res) {
   console.log(req.session.userType);
   if(req.session.isLogin){
     if(req.session.userType == 'student'){
-      var sql = "SELECT * FROM students WHERE instructor_id = ?";
+      var sql = "SELECT * FROM students WHERE student_id = ?";
     }
     else if (req.session.userType == 'instructor'){
       console.log("OK")
