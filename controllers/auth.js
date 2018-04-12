@@ -25,6 +25,31 @@ router.post('/instructor', function (req, res) {
   });
 });
 
+router.get('/check', function (req, res) {
+  console.log(req.session.isLogin);
+  console.log(req.session.userID);
+  console.log(req.session.userType);
+  if(req.session.isLogin){
+    if(req.session.userType == 'student'){
+      var sql = "SELECT * FROM students WHERE instructor_id = ?";
+    }
+    else if (req.session.userType == 'instructor'){
+      console.log("OK")
+      var sql = "SELECT * FROM instructors WHERE instructor_id = ?";
+    } 
+    mysql.query(sql,[req.session.userID],function(err,result){
+      if(err) res.send({});
+      else{
+        if(result.length === 0) res.send({});
+        else{
+          res.send({user: result[0]});
+        }
+      }
+    });
+  }
+  else res.send({});
+});
+
 router.post('/logout', function(req, res) {
   req.session.isLogin = false;
   req.session.userID = false;
