@@ -9,17 +9,11 @@ router.get('/', function (req, res, next) {
   });
 });
 
-router.get('/status', function(req, res) {
-	res.send(req.session.isLogin ? 'ONLINE' : 'OFFLINE');
-});
-
-router.get('/login', function(req, res) {
-	req.session.isLogin = true;
-	res.send('OK');
-});
-
-router.get('/logout', function(req, res) {
-	res.send('OK');
+router.post('/logout', function(req, res) {
+  req.session.isLogin = false;
+  req.session.userID = false;
+  req.session.userType = false;
+  res.send({ result: 'OK' });
 });
 
 module.exports = router;
