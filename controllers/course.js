@@ -10,6 +10,7 @@ router.get('/all', function (req, res, next) {
 				let queryStudent = 'SELECT * FROM students WHERE student_id = ?';
 				mysql.query(queryStudent, [register.student_id], (err, students) => {
 					if (err) return reject(err);
+					delete students[0].password;
 					section.students.push(students[0]);
 					students[0].grade = register.grade;
 					resolve();

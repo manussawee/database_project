@@ -19,6 +19,7 @@ router.post('/instructor', function (req, res) {
 				req.session.isLogin = true;
 				req.session.userID = req.body.instructor_id;
 				req.session.userType = 'instructor';
+				delete result[0].password;
 				res.send({ user: result[0] });
 			}
 		}
@@ -42,6 +43,7 @@ router.get('/check', function (req, res) {
 			else {
 				if (result.length === 0) res.send({});
 				else {
+					delete result[0].password;
 					res.send({ user: result[0] });
 				}
 			}
