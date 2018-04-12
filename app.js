@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var cookieSession = require('cookie-session');
 
 var mysql = require('./config/mysql');
 mysql.connect(function (err) {
@@ -18,6 +19,14 @@ var courseController = require('./controllers/course');
 var generateController = require('./controllers/generate');
 
 var app = express();
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ['I', 'Love', 'Database'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
