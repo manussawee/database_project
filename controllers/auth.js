@@ -23,17 +23,12 @@ router.post('/instructor', function (req, res) {
   });
 });
 
-router.get('/status', function(req, res) {
-	res.send(req.session.isLogin ? 'ONLINE' : 'OFFLINE');
-});
+router.post('/logout', function(req, res) {
+  req.session.isLogin = false;
+  req.session.userID = false;
+  req.session.userType = false;
+  res.send({ result: 'OK' });
 
-router.get('/login', function(req, res) {
-	req.session.isLogin = true;
-	res.send('OK');
-});
-
-router.get('/logout', function(req, res) {
-	res.send('OK');
 });
 
 module.exports = router;
