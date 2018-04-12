@@ -10,15 +10,17 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/instructor', function (req, res) {
-  var sql = "SELECT * FROM instructors I WHERE I.instructor_id = ? and I.password = ?";
+  var sql = "SELECT * FROM instructors WHERE instructor_id = ? and password = ?";
   mysql.query(sql,[req.body.instructor_id, req.body.password ], function (err, result) {
-    if (err) console.log("ERROR");
+    if (err) res.send({});
     else {
-      req.session.userID = req.body.instructor_id;
-      req.session.isLogin = true;
-      console.log(req.session.userID);
-      console.log(req.session.isLogin);
-      res.send(result);
+      if(result.length === 0) res.send({});
+      else {
+				req.session.isLogin = true;
+				req.session.userID = req.body.instructor_id;
+				req.session.userType = 'instructor';
+				res.send({user: result[0]});
+			}
     }
   });
 });
