@@ -50,6 +50,7 @@ router.get('/check', function (req, res) {
   else res.send({});
 });
 
+
 router.post('/logout', function(req, res) {
   req.session.isLogin = false;
   req.session.userID = false;
