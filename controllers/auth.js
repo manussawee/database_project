@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var mysql = require('../config/mysql');
+let express = require('express');
+let router = express.Router();
+let mysql = require('../config/mysql');
 
 router.get('/', function (req, res, next) {
 	mysql.query("SELECT * FROM students", function (err, result) {
@@ -10,10 +10,10 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/student', function(req,res){
-	var student_id = req.body.student_id;
-	var password = req.body.password;
-	var is_found = false;
-	var is_grad = false;
+	let student_id = req.body.student_id;
+	let password = req.body.password;
+	let is_found = false;
+	let is_grad = false;
 	const query = `SELECT * FROM students\
 	WHERE student_id = ${student_id} AND password = ${password};`;
 	mysql.query(query, function(err, result, fields){
@@ -24,7 +24,7 @@ router.post('/student', function(req,res){
 		req.session.userID = student_id;
 		is_found = true;
 		// return res.send('FOUND');
-		var query2 = `SELECT * FROM students A RIGHT JOIN grad_students B\
+		let query2 = `SELECT * FROM students A RIGHT JOIN grad_students B\
 		  ON A.student_id = B.student_id  WHERE B.student_id = ${student_id}`;
 		mysql.query(query2, function(err,result,fields){
 		  if(err) throw err;
@@ -34,7 +34,7 @@ router.post('/student', function(req,res){
 			  return res.send(result);
 			}
 			if(!is_grad){
-			  var query3 = `SELECT * FROM students A RIGHT JOIN undergrad_students B\
+			  let query3 = `SELECT * FROM students A RIGHT JOIN undergrad_students B\
 			  ON A.student_id = B.student_id  WHERE B.student_id = ${student_id}`;
 			  mysql.query(query3,function(err,result,fields){
 				if(err) throw err;
@@ -51,7 +51,7 @@ router.post('/student', function(req,res){
 });
 
 router.post('/instructor', function (req, res) {
-	var sql = "SELECT * FROM instructors WHERE instructor_id = ? and password = ?";
+	let sql = "SELECT * FROM instructors WHERE instructor_id = ? and password = ?";
 	mysql.query(sql, [req.body.instructor_id, req.body.password], function (err, result) {
 		if (err) res.send({});
 		else {
@@ -73,11 +73,11 @@ router.get('/check', function (req, res) {
 	console.log(req.session.userType);
 	if (req.session.isLogin) {
 		if (req.session.userType == 'student') {
-			var sql = "SELECT * FROM students WHERE student_id = ?";
+			let sql = "SELECT * FROM students WHERE student_id = ?";
 		}
 		else if (req.session.userType == 'instructor') {
 			console.log("OK")
-			var sql = "SELECT * FROM instructors WHERE instructor_id = ?";
+			let sql = "SELECT * FROM instructors WHERE instructor_id = ?";
 		}
 		mysql.query(sql, [req.session.userID], function (err, result) {
 			if (err) res.send({});
