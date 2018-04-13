@@ -9,8 +9,23 @@ router.get('/', function (req, res, next) {
   });
 });
 
+router.post('/register/withdraw', function(req, res, next){
+  var course_id = req.body.course_id;
+  var section_id = req.body.section_id;
+  var year = req.body.year;
+  var semester = req.body.semester;
+  var student_id = req.session.userID;
+  var query = `UPDATE register SET grade = 'W' WHERE course_id=${course_id} AND section_id=${section_id}\
+  AND year=${year} AND semester=${semester} AND student_id=${student_id}`;
+  mysql.query(query, function(err, result){
+    if(err) return res.send('FAIL');
+    else{
+      return res.send('OK')
+    }
+  });
+});
+
 router.post('/register/remove', function(req, res, next){
-  req.session.userID = 456487;
   var course_id = req.body.course_id;
   var section_id = req.body.section_id;
   var year = req.body.year;
