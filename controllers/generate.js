@@ -137,9 +137,9 @@ router.get('/database', function (req, res, next) {
   });
 
   Promise.all(promises)
-  .then(() => res.send('SUCCESS'))
-  .catch(err => res.send(err));
-  
+    .then(() => res.send('SUCCESS'))
+    .catch(err => res.send(err));
+
 });
 
 module.exports = router;
