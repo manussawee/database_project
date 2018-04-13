@@ -22,7 +22,7 @@ var app = express();
 
 app.use(cookieSession({
   name: 'session',
-  keys: ['I', 'Love', 'Database'],
+  keys: ['I', 'Love', 'Database','userID','isLogin'],
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
