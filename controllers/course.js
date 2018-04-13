@@ -3,7 +3,6 @@ var router = express.Router();
 var mysql = require('../config/mysql');
 
 router.get('/all', function (req, res, next) {
-
 	const mapRegisterStudent = (section, registers) => new Promise((resolve, reject) => {
 		const promises = registers.map(register => {
 			return new Promise((resolve, reject) => {

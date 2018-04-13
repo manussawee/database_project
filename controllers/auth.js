@@ -14,39 +14,38 @@ router.post('/student', function(req,res){
 	var password = req.body.password;
 	var is_found = false;
 	var is_grad = false;
-	const query = `SELECT * FROM students\
-	WHERE student_id = ${student_id} AND password = ${password};`;
+	const query = `SELECT * FROM students WHERE student_id = ${student_id} AND password = ${password};`;
 	mysql.query(query, function(err, result, fields){
-	  if(err){
-		throw err;
-	  }
+	  if(err) throw err;
 	  else{
-		req.session.userID = student_id;
-		is_found = true;
-		// return res.send('FOUND');
-		var query2 = `SELECT * FROM students A RIGHT JOIN grad_students B\
-		  ON A.student_id = B.student_id  WHERE B.student_id = ${student_id}`;
-		mysql.query(query2, function(err,result,fields){
-		  if(err) throw err;
-		  else{
-			if(result.length != 0){
-			  is_grad = true;
-			  return res.send(result);
-			}
-			if(!is_grad){
-			  var query3 = `SELECT * FROM students A RIGHT JOIN undergrad_students B\
-			  ON A.student_id = B.student_id  WHERE B.student_id = ${student_id}`;
-			  mysql.query(query3,function(err,result,fields){
-				if(err) throw err;
-				else{
-				  return res.send(result);
-				}
-			  })
-			}
-		  }
-		});
-  
-	  }
+      req.session.isLogin = true;
+			req.session.userType = 'student';
+			req.session.userID = student_id;
+		  is_found = true;
+		  var query2 = `SELECT * FROM students A RIGHT JOIN grad_students B\
+		    ON A.student_id = B.student_id  WHERE B.student_id = ${student_id}`;
+		  mysql.query(query2, function(err,result,fields){
+        if(err) throw err;
+		    else{
+			    if(result.length != 0){
+			      is_grad = true;
+            delete result[0].password;
+            res.send({ user:result[0] });
+			    }
+			    if(!is_grad){
+			      var query3 = `SELECT * FROM students A RIGHT JOIN undergrad_students B\
+			        ON A.student_id = B.student_id  WHERE B.student_id = ${student_id}`;
+			      mysql.query(query3,function(err,result,fields){
+				      if(err) throw err;
+				      else{
+                delete result[0].password;
+				        res.send({ user:result[0] });
+				      }
+			      });
+			    }
+		    }
+		  });
+    }
 	});
 });
 
@@ -61,7 +60,7 @@ router.post('/instructor', function (req, res) {
 				req.session.userID = req.body.instructor_id;
 				req.session.userType = 'instructor';
 				delete result[0].password;
-				res.send({ user: result[0] });
+				res.send({ user: result[0]});
 			}
 		}
 	});
@@ -70,17 +69,19 @@ router.post('/instructor', function (req, res) {
 router.get('/check', function (req, res) {
 	console.log(req.session.isLogin);
 	console.log(req.session.userID);
-	console.log(req.session.userType);
+  console.log(req.session.userType);
+  let sql;
 	if (req.session.isLogin) {
-		if (req.session.userType == 'student') {
-			var sql = "SELECT * FROM students WHERE student_id = ?";
+		if (req.session.userType === 'student') {
+			sql = "SELECT * FROM students WHERE student_id = ?";
 		}
-		else if (req.session.userType == 'instructor') {
+		else if (req.session.userType === 'instructor') {
 			console.log("OK")
-			var sql = "SELECT * FROM instructors WHERE instructor_id = ?";
+			sql = "SELECT * FROM instructors WHERE instructor_id = ?";
 		}
 		mysql.query(sql, [req.session.userID], function (err, result) {
-			if (err) res.send({});
+      console.log("IN");
+      if (err) res.send({});
 			else {
 				if (result.length === 0) res.send({});
 				else {
