@@ -78,4 +78,26 @@ router.post('/register/remove', function(req, res, next){
   });
 });
 
+//DOES NOT CHECK RAD OR UNDER GRAD
+router.get('/course/all',function(req,res){
+  if(req.session.userType === 'student'){
+    let userID = req.session.userID;
+    let sql = `SELECT course_id, section_id, grade FROM register WHERE student_id = ${userID};`
+    let result = [];
+    mysql.query(sql,function(err,courses){
+      if (err) res.send({});
+      else{
+        courses.map((course,index) =>{
+          result.push(course);
+          console.log(courses.length-1);
+          if(index === courses.length-1) {
+            console.log("OK");
+            res.send({'courses' : result});
+          }
+        });
+      }
+    });
+  }
+  else res.send({});
+});
 module.exports = router;
