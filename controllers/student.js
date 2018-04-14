@@ -8,6 +8,32 @@ router.get('/', function (req, res, next) {
     else res.send(result);
   });
 });
+// DOES NOT CHECK GRAD AND UNGRAD
+router.post('/register/add',function(req,res){
+  let checksql = "SELECT * FROM sections \
+          WHERE course_id = ? AND\
+                section_id = ? AND\
+                year = ? AND\
+                semester = ? ; ";
+  let sql = "INSERT INTO register (`course_id`,`section_id`,`year`,`semester`,`student_id`,`grade`)\
+     VALUES (?, ?, ?, ?,?, 'R') ";              
+  mysql.query(checksql,[req.body.course_id, req.body.section_id, req.body.year ,req.body.semester],function(err,result){
+    if (err) console.log("CHECK ERROR");
+    else if(result.lenght === 0 ) res.send("NOT FOUND COURSE");
+    else{
+      mysql.query(sql,[req.body.course_id, req.body.section_id, req.body.year ,req.body.semester,req.session.userID],function(err,result){
+        if(req.session.userType === 'student'){
+          if (err) res.send("FAIL");
+          else {
+            console.log(result);
+            res.send("OK");
+          }
+        }
+        else res.send("FAIL NOT STUDENT");
+      });
+    }
+  });
+});
 
 router.post('/register/withdraw', function(req, res, next){
   var course_id = req.body.course_id;
