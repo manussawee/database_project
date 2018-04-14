@@ -36,7 +36,7 @@ router.post('/register/add',function(req,res){
 });
 
 router.post('/request', function(req, res, next){
-  if(!req.session.isLogin) res.send('FAIL');
+  if(!req.session.isLogin || req.session.userType != 'student') res.send('FAIL');
   else{
     let query = `INSERT INTO requests (student_id, type) VALUES (${req.session.userID.toString()}, '${req.body.type}')`
     mysql.query(query, function(err, result){
@@ -47,7 +47,7 @@ router.post('/request', function(req, res, next){
 });
 
 router.get('/payment', function(req, res, next){
-  if(!req.session.isLogin) res.send('FAIL');
+  if(!req.session.isLogin || req.session.userType != 'student') res.send('FAIL');
   else{
     let student_id = req.session.userID.toString();
     let query = `SELECT * FROM undergrad_students WHERE student_id=${req.session.userID }`;
@@ -73,7 +73,7 @@ router.get('/payment', function(req, res, next){
 });
 
 router.post('/register/withdraw', function(req, res, next){
-  if(!req.session.isLogin) res.send('FAIL');
+  if(!req.session.isLogin || req.session.userType != 'student') res.send('FAIL');
   else{
     let course_id = req.body.course_id;
     let section_id = req.body.section_id;
@@ -92,7 +92,7 @@ router.post('/register/withdraw', function(req, res, next){
 });
 
 router.post('/register/remove', function(req, res, next){
-  if(!req.session.isLogin) res.send('FAIL');
+  if(!req.session.isLogin || req.session.userType != 'student') res.send('FAIL');
   else{
     let course_id = req.body.course_id;
     let section_id = req.body.section_id;
