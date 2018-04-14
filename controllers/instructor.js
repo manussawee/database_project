@@ -108,15 +108,19 @@ router.get('/course/all',function(req,res){
 		});
 	});
 
-	const query = 'SELECT * FROM teach';
-	mysql.query(query, function (err, courses) {
-		if (err) console.error(err);
-		else mapCourseSection(courses).then(() => {
-			res.send({ courses: courses });
-		}).catch((err) => {
-			res.send({});
-		});
-	});
+  if(req.session.userType === 'instructor'){
+    let userID = req.session.userID;
+    const query = `SELECT * FROM teach WHERE instructor_id = ${userID}`;
+    mysql.query(query, function (err, courses) {
+      if (err) console.error(err);
+      else mapCourseSection(courses).then(() => {
+        res.send({ courses: courses });
+      }).catch((err) => {
+        res.send({});
+      });
+    });
+  }
+  else res.send({});
 
 
 });
