@@ -8,6 +8,32 @@ router.get('/', function (req, res, next) {
     else res.send(result);
   });
 });
+// DOES NOT CHECK GRAD AND UNGRAD
+router.post('/register/add',function(req,res){
+  let checksql = "SELECT * FROM sections \
+          WHERE course_id = ? AND\
+                section_id = ? AND\
+                year = ? AND\
+                semester = ? ; ";
+  let sql = "INSERT INTO register (`course_id`,`section_id`,`year`,`semester`,`student_id`,`grade`)\
+     VALUES (?, ?, ?, ?,?, 'R') ";              
+  mysql.query(checksql,[req.body.course_id, req.body.section_id, req.body.year ,req.body.semester],function(err,result){
+    if (err) console.log("CHECK ERROR");
+    else if(result.lenght === 0 ) res.send("NOT FOUND COURSE");
+    else{
+      mysql.query(sql,[req.body.course_id, req.body.section_id, req.body.year ,req.body.semester,req.session.userID],function(err,result){
+        if(req.session.userType === 'student'){
+          if (err) res.send("FAIL");
+          else {
+            console.log(result);
+            res.send("OK");
+          }
+        }
+        else res.send("FAIL NOT STUDENT");
+      });
+    }
+  });
+});
 
 router.get('/payment', function(req, res,next){
   let student_id = req.session.userID.toString();
@@ -75,4 +101,52 @@ router.post('/register/remove', function(req, res, next){
   });
 });
 
+//DOES NOT CHECK RAD OR UNDER GRAD
+router.get('/course/all',function(req,res){
+  if(req.session.userType === 'student'){
+    let userID = req.session.userID;
+    let sql = `SELECT course_id, section_id, grade FROM register WHERE student_id = ${userID};`
+    let result = [];
+    mysql.query(sql,function(err,courses){
+      if (err) res.send({});
+      else{
+        courses.map((course,index) =>{
+          result.push(course);
+          console.log(courses.length-1);
+          if(index === courses.length-1) {
+            console.log("OK");
+            res.send({'courses' : result});
+          }
+        });
+      }
+    });
+  }
+  else res.send({});
+});
+
+router.get('/request',function(req,res){
+  if(req.session.userType === 'student'){
+    let userID = req.session.userID;
+    let sql = `SELECT * FROM requests WHERE student_id = ${userID};`
+    let result = [];
+    mysql.query(sql,function(err,requests){
+      if (err) res.send({});
+      else{
+        requests.map((request,index) =>{
+          result.push(request);
+          console.log(requests.length-1);
+          if(index === requests.length-1) {
+            console.log("OK");
+            res.send({'requests' : result});
+          }
+        });
+      }
+    });
+  }
+  else res.send({});
+});
+
+
+// Result: 
+// {requests: request (array of object)}
 module.exports = router;

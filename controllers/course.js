@@ -3,7 +3,6 @@ var router = express.Router();
 var mysql = require('../config/mysql');
 
 router.get('/all', function (req, res, next) {
-
 	const mapRegisterStudent = (section, registers) => new Promise((resolve, reject) => {
 		const promises = registers.map(register => {
 			return new Promise((resolve, reject) => {
@@ -88,4 +87,14 @@ router.get('/all', function (req, res, next) {
 
 });
 
+router.get('/section',function(req,res){
+	let courseID = req.query.course_id;
+	let sql = `SELECT * FROM sections WHERE course_id = ${courseID};`
+    let result = [];
+    mysql.query(sql,function(err,sections){
+      console.log(sections);
+      if (err) res.send({});
+	  else  res.send({'sections' : sections});
+    });
+});
 module.exports = router;
