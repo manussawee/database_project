@@ -100,4 +100,30 @@ router.get('/course/all',function(req,res){
   }
   else res.send({});
 });
+
+router.get('/request',function(req,res){
+  if(req.session.userType === 'student'){
+    let userID = req.session.userID;
+    let sql = `SELECT * FROM requests WHERE student_id = ${userID};`
+    let result = [];
+    mysql.query(sql,function(err,requests){
+      if (err) res.send({});
+      else{
+        requests.map((request,index) =>{
+          result.push(request);
+          console.log(requests.length-1);
+          if(index === requests.length-1) {
+            console.log("OK");
+            res.send({'requests' : result});
+          }
+        });
+      }
+    });
+  }
+  else res.send({});
+});
+
+
+// Result: 
+// {requests: request (array of object)}
 module.exports = router;
