@@ -10,26 +10,36 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/advisees',function(req,res){
+  const mapStudentRegis = (students) => new Promise((resolve, reject) => {
+    console.log(students);
+		const promises = students.map((student) => {
+			return new Promise((resolve, reject) => {
+				let queryRegis = 'SELECT * FROM register R RIGHT JOIN courses C ON R.course_id = C.course_id WHERE student_id = ?';
+				mysql.query(queryRegis, [student.student_id], (err, courses) => {
+					if (err) return reject(err);
+          student.courses = courses;
+          resolve();
+				});
+			});
+		});
+
+		Promise.all(promises).then(() => {
+			resolve();
+		}).catch((err) => {
+			reject(err);
+		});
+	});
+  
   if(req.session.userType === 'instructor'){
     let userID = req.session.userID;
-    let sql = `SELECT S.student_id, course_id, year,semester, grade \
-              FROM students S INNER JOIN register R ON S.student_id = R.student_id
-              WHERE advisor_id = ${userID};`
-    let result = [];
-    console.log(userID);
-    mysql.query(sql,function(err,students){
-      console.log(students);
-      if (err) res.send({});
-      else{
-        students.map((student,index) =>{
-          result.push(student);
-          console.log(students.length-1);
-          if(index === students.length-1) {
-            console.log("OK3");
-            res.send({'students' : result});
-          }
-        });
-      }
+    const query = `SELECT * FROM students WHERE advisor_id = ${userID};`;
+    mysql.query(query, function (err, students) {
+      if (err) console.error(err);
+      else mapStudentRegis(students).then(() => {
+        res.send({ students : students });
+      }).catch((err) => {
+        res.send({});
+      });
     });
   }
   else res.send({});
@@ -110,7 +120,7 @@ router.get('/course/all',function(req,res){
 
   if(req.session.userType === 'instructor'){
     let userID = req.session.userID;
-    const query = `SELECT * FROM teach WHERE instructor_id = ${userID}`;
+    const query = `SELECT * FROM teach WHERE _id = ${userID}`;
     mysql.query(query, function (err, courses) {
       if (err) console.error(err);
       else mapCourseSection(courses).then(() => {
