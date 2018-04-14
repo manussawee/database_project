@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var mysql = require('../config/mysql');
+let express = require('express');
+let router = express.Router();
+let mysql = require('../config/mysql');
 
 router.get('/', function (req, res, next) {
 	mysql.query("SELECT * FROM students", function (err, result) {
@@ -10,11 +10,12 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/student', function(req,res){
-	var student_id = req.body.student_id;
-	var password = req.body.password;
-	var is_found = false;
-	var is_grad = false;
-	const query = `SELECT * FROM students WHERE student_id = ${student_id} AND password = ${password};`;
+	let student_id = req.body.student_id;
+	let password = req.body.password;
+	let is_found = false;
+	let is_grad = false;
+	const query = `SELECT * FROM students\
+	WHERE student_id = ${student_id} AND password = ${password};`;
 	mysql.query(query, function(err, result, fields){
 	  if(err) throw err;
 	  else{
@@ -50,7 +51,7 @@ router.post('/student', function(req,res){
 });
 
 router.post('/instructor', function (req, res) {
-	var sql = "SELECT * FROM instructors WHERE instructor_id = ? and password = ?";
+	let sql = "SELECT * FROM instructors WHERE instructor_id = ? and password = ?";
 	mysql.query(sql, [req.body.instructor_id, req.body.password], function (err, result) {
 		if (err) res.send({});
 		else {
