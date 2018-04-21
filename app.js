@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cookieSession = require('cookie-session');
+var cors = require('cors');
 
 var mysql = require('./config/mysql');
 mysql.connect(function (err) {
@@ -19,6 +20,13 @@ var courseController = require('./controllers/course');
 var generateController = require('./controllers/generate');
 
 var app = express();
+
+app.use(cors());
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.use(cookieSession({
   name: 'session',
