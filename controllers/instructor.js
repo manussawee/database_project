@@ -83,7 +83,7 @@ router.get('/course/all',function(req,res){
 				})
 			}
 
-			res.send(courses);
+			courses[check[section.course_id]].sections.push(section);
 		});
 
 		res.send({ courses: courses });
