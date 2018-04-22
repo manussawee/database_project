@@ -56,93 +56,42 @@ router.get('/advisees',function(req,res){
 });
 
 router.get('/course/all',function(req,res){
-  const mapRegisterStudent = (section, registers) => new Promise((resolve, reject) => {
-		const promises = registers.map(register => {
-			return new Promise((resolve, reject) => {
-				let queryStudent = 'SELECT * FROM students WHERE student_id = ?';
-				mysql.query(queryStudent, [register.student_id], (err, students) => {
-					if (err) return reject(err);
-					delete students[0].password;
-					section.students.push(students[0]);
-					students[0].grade = register.grade;
-					resolve();
-				});
-			});
-		});
-
-		Promise.all(promises).then(() => {
-			resolve();
-		}).catch((err) => {
-			reject(err);
+	if(req.session.userType !== 'instructor') return res.send({});
+	const instructorID = req.session.userID;
+	const query = 'SELECT * FROM (teach NATURAL JOIN sections) NATURAL JOIN courses WHERE instructor_id = ' + instructorID;
+	
+	const promise = new Promise((resolve, reject) => {
+		mysql.query(query, function(err, sections) {
+			if (err) reject(err);
+			else resolve(sections);
 		});
 	});
+	
+	let courses = [];
+	let check = []
+	promise.then(sections => {
+		
+		sections.map(section => {
+			if(check[section.course_id] === undefined) {
+				check[section.course_id] = courses.length;
+				courses.push({
+					course_id: section.course_id,
+					name: section.name,
+					credit: section.credit,
+					faculty_id: section.faculty_id,
+					sections: [],
+				})
+			}
 
-	const mapSectionRegister = (sections) => new Promise((resolve, reject) => {
-		const promises = sections.map(section => {
-			return new Promise((resolve, reject) => {
-				section.students = [];
-				let queryRegisters = 'SELECT * FROM register WHERE course_id = ? AND section_id = ? AND year = ? AND semester = ?';
-				mysql.query(queryRegisters, [
-					section.course_id,
-					section.section_id,
-					section.year,
-					section.semester,
-				], (err, registers) => {
-					if (err) return reject(err);
-					mapRegisterStudent(section, registers).then(() => {
-						resolve();
-					}).catch((err) => {
-						reject(err)
-					});
-				});
-			});
+			res.send(courses);
 		});
 
-		Promise.all(promises).then(() => {
-			resolve();
-		}).catch((err) => {
-			reject(err);
-		});
+		// res.send({ courses: courses });
+		console.log(courses);
+	}).catch(err => {
+		console.log(err);
+		res.send({});
 	});
-
-	const mapCourseSection = (courses) => new Promise((resolve, reject) => {
-		const promises = courses.map((course) => {
-			return new Promise((resolve, reject) => {
-				let querySection = 'SELECT * FROM sections WHERE course_id = ?';
-				mysql.query(querySection, [course.course_id], (err, sections) => {
-					if (err) return reject(err);
-					course.sections = sections;
-					mapSectionRegister(sections).then(() => {
-						resolve();
-					}).catch((err) => {
-						reject(err);
-					});
-				});
-			});
-		});
-
-		Promise.all(promises).then(() => {
-			resolve();
-		}).catch((err) => {
-			reject(err);
-		});
-	});
-
-  if(req.session.userType === 'instructor'){
-    let userID = req.session.userID;
-    const query = `SELECT * FROM teach WHERE _id = ${userID}`;
-    mysql.query(query, function (err, courses) {
-      if (err) console.error(err);
-      else mapCourseSection(courses).then(() => {
-        res.send({ courses: courses });
-      }).catch((err) => {
-        res.send({});
-      });
-    });
-  }
-  else res.send({});
-
-
 });
 
 module.exports = router;
