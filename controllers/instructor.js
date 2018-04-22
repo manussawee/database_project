@@ -86,8 +86,7 @@ router.get('/course/all',function(req,res){
 			res.send(courses);
 		});
 
-		// res.send({ courses: courses });
-		console.log(courses);
+		res.send({ courses: courses });
 	}).catch(err => {
 		console.log(err);
 		res.send({});
