@@ -399,6 +399,8 @@ router.get('/data', function (req, res) {
     "insert into fees values (4, 'Additional Fee', '50000', '2015', 16, 21)",
     "insert into fees values (5, 'Additional Fee', '50000', '2015', 17, 21)",
     // pay
+    "insert into pay values (1, '5831057021')",
+    "insert into pay values (2, '5831057021')",
     // students
     "insert into students values ('1409901439999', 'Manussawee Tepakidareekul', '5831057021', '123456', 'Computer Olympiad', '1', '21', '13')",
     // undergrad_students

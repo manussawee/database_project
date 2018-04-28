@@ -50,24 +50,12 @@ router.get('/payment', function(req, res, next){
   if(!req.session.isLogin || req.session.userType != 'student') res.send('FAIL');
   else{
     let student_id = req.session.userID.toString();
-    let query = `SELECT * FROM undergrad_students WHERE student_id=${req.session.userID }`;
-    mysql.query(query, function (err, result1){
-      if(err || result1.length == 0) return res.send('ERROR');
-      else{
-        query = `SELECT * FROM students WHERE student_id=${req.session.userID }`;
-        mysql.query(query, function (err, result2){
-          if(err) return res.send('ERROR');
-          else{
-            let date  = new Date().getFullYear();
-            query = `SELECT * FROM fees WHERE year=${date} AND department_id=${result2[0].department_id}\
-            AND faculty_id=${result2[0].faculty_id}`;
-            mysql.query(query, function(err, result3){
-              if(err) return res.send('ERROR');
-              else return res.send(result3);
-            });
-          }
-        });
-      }
+    let query = 'SELECT * FROM pay NATURAL JOIN fees WHERE student_id = ' + student_id;
+    mysql.query(query, (err, result) => {
+      if(err) return res.send({});
+      return res.send({
+        fees: result,
+      });
     });
   }
 });
