@@ -125,20 +125,60 @@ router.post('/register/remove', function(req, res, next){
 router.get('/course/all',function(req,res){
 
   const student_id = req.session.userID;
-  console.log(student_id)
-  const query = `select * from register natural join courses where student_id = ${student_id};`
-  	
-	const promise = new Promise((resolve, reject) => {
-		mysql.query(query, function(err, doc) {
-			if (err) {
-        console.log(err);
-        reject(err) 
+  const query = 'SELECT * FROM (register NATURAL JOIN (sections NATURAL JOIN time_slots)) NATURAL JOIN courses WHERE student_id = ' + student_id;
+
+  const promise = new Promise((resolve, reject) => {
+    mysql.query(query, function (err, timeSlots) {
+      if (err) reject(err);
+      else resolve(timeSlots);
+    });
+  });
+
+  let courses = [];
+
+  promise.then(timeSlots => {
+
+    timeSlots.map(timeSlot => {
+
+      let course = courses.find((course) => course.course_id === timeSlot.course_id);
+      if (course === undefined) {
+        course = {
+          course_id: timeSlot.course_id,
+          name: timeSlot.name,
+          credit: timeSlot.credit,
+          faculty_id: timeSlot.faculty_id,
+          sections: [],
+        };
+        courses.push(course);
       }
-			else resolve(doc);
-		});
-	});
-	
-	promise.then((doc) => {res.send(doc)}).catch((err) => res.send(err));
+
+      let section = course.sections.find(section => section.section_id === timeSlot.section_id);
+      if (section === undefined) {
+        section = {
+          section_id: timeSlot.section_id,
+          year: timeSlot.year,
+          semester: timeSlot.semester,
+          capacity: timeSlot.capacity,
+          building_id: timeSlot.building_id,
+          room_id: timeSlot.room_id,
+          time_slots: []
+        };
+        course.sections.push(section);
+      }
+
+      section.time_slots.push({
+        slot_order: timeSlot.slot_order,
+        day: timeSlot.day,
+        start_time: timeSlot.start_time,
+        end_time: timeSlot.end_time,
+      });
+    });
+
+    res.send({ courses: courses });
+  }).catch(err => {
+    console.log(err);
+    res.send({});
+  });
 });
 
 router.get('/request',function(req,res){
