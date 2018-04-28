@@ -58,32 +58,53 @@ router.get('/advisees',function(req,res){
 router.get('/course/all',function(req,res){
 	if(req.session.userType !== 'instructor') return res.send({});
 	const instructorID = req.session.userID;
-	const query = 'SELECT * FROM (teach NATURAL JOIN sections) NATURAL JOIN courses WHERE instructor_id = ' + instructorID;
+	const query = 'SELECT * FROM (teach NATURAL JOIN (sections NATURAL JOIN time_slots)) NATURAL JOIN courses WHERE instructor_id = ' + instructorID;
 	
 	const promise = new Promise((resolve, reject) => {
-		mysql.query(query, function(err, sections) {
+		mysql.query(query, function(err, timeSlots) {
 			if (err) reject(err);
-			else resolve(sections);
+			else resolve(timeSlots);
 		});
 	});
 	
 	let courses = [];
-	let check = []
-	promise.then(sections => {
-		
-		sections.map(section => {
-			if(check[section.course_id] === undefined) {
-				check[section.course_id] = courses.length;
-				courses.push({
-					course_id: section.course_id,
-					name: section.name,
-					credit: section.credit,
-					faculty_id: section.faculty_id,
+
+	promise.then(timeSlots => {
+
+		timeSlots.map(timeSlot => {
+
+			let course = courses.find((course) => course.course_id === timeSlot.course_id);
+			if(course === undefined) {
+				course = {
+					course_id: timeSlot.course_id,
+					name: timeSlot.name,
+					credit: timeSlot.credit,
+					faculty_id: timeSlot.faculty_id,
 					sections: [],
-				})
+				};
+				courses.push(course);
 			}
 
-			courses[check[section.course_id]].sections.push(section);
+			let section = course.sections.find(section => section.section_id === timeSlot.section_id);
+			if(section === undefined) {
+				section = {
+					section_id: timeSlot.section_id,
+					year: timeSlot.year,
+					semester: timeSlot.semester,
+					capacity: timeSlot.capacity,
+					building_id: timeSlot.building_id,
+					room_id: timeSlot.room_id,
+					time_slots: []
+				};
+				course.sections.push(section);
+			}
+
+			section.time_slots.push({
+				slot_order: timeSlot.slot_order,
+				day: timeSlot.day,
+				start_time: timeSlot.start_time,
+				end_time: timeSlot.end_time,
+			});
 		});
 
 		res.send({ courses: courses });
