@@ -19,9 +19,12 @@ router.post('/student', function(req,res){
 	mysql.query(query, function(err, result, fields){
 	  if(err) throw err;
 	  else{
-      req.session.isLogin = true;
-			req.session.userType = 'student';
-			req.session.userID = student_id;
+			let token = session.generateToken(32);
+			session.tokens[token] = {
+				isLogin: true,
+				userID: req.body.instructor_id,
+				userType: 'instructor',
+			}
 		  is_found = true;
 		  var query2 = `SELECT * FROM students A RIGHT JOIN grad_students B\
 		    ON A.student_id = B.student_id  WHERE B.student_id = ${student_id}`;
@@ -30,8 +33,11 @@ router.post('/student', function(req,res){
 		    else{
 			    if(result.length != 0){
 			      is_grad = true;
-            delete result[0].password;
-            res.send({ user:result[0] });
+						delete result[0].password;
+						res.send({
+							user: result[0],
+							token: token,
+						});
 			    }
 			    if(!is_grad){
 			      var query3 = `SELECT * FROM students A RIGHT JOIN undergrad_students B\
@@ -39,8 +45,11 @@ router.post('/student', function(req,res){
 			      mysql.query(query3,function(err,result,fields){
 				      if(err) throw err;
 				      else{
-                delete result[0].password;
-				        res.send({ user:result[0] });
+								delete result[0].password;
+								res.send({
+									user: result[0],
+									token: token,
+								});
 				      }
 			      });
 			    }
@@ -57,20 +66,23 @@ router.post('/instructor', function (req, res) {
 		else {
 			if (result.length === 0) res.send({});
 			else {
-				req.session.isLogin = true;
-				req.session.userID = req.body.instructor_id;
-				req.session.userType = 'instructor';
+				let token = session.generateToken(32);
+				session.tokens[token] = {
+					isLogin: true,
+					userID: req.body.instructor_id,
+					userType: 'instructor',
+				}
 				delete result[0].password;
-				res.send({ user: result[0]});
+				res.send({
+					user: result[0],
+					token: token,
+				});
 			}
 		}
 	});
 });
 
 router.get('/check', function (req, res) {
-	console.log(req.session.isLogin);
-	console.log(req.session.userID);
-  console.log(req.session.userType);
   let sql;
 	if (req.session.isLogin) {
 		if (req.session.userType === 'student') {
@@ -96,10 +108,11 @@ router.get('/check', function (req, res) {
 });
 
 router.post('/logout', function (req, res) {
-	req.session.isLogin = false;
-	req.session.userID = false;
-	req.session.userType = false;
-	res.send({ result: 'OK' });
+	if (req.query.token && session.tokens[req.query.token]) {
+		delete tokens[req.query.token];
+		res.send({ result: 'OK' });
+	}
+	else res.send({ result: 'ERROR' });
 
 });
 

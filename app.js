@@ -4,7 +4,6 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var cookieSession = require('cookie-session');
 var cors = require('cors');
 
 var mysql = require('./config/mysql');
@@ -12,12 +11,6 @@ mysql.connect(function (err) {
   if (err) throw err;
   console.log("Connected!");
 });
-
-var authController = require('./controllers/auth');
-var studentController = require('./controllers/student');
-var instructorController = require('./controllers/instructor');
-var courseController = require('./controllers/course');
-var generateController = require('./controllers/generate');
 
 var app = express();
 
@@ -27,19 +20,29 @@ app.use(cors({
   credentials: true
 }));
 
+var session = require('./config/session');
+global.session = session;
+app.use(session.mask);
+
+var authController = require('./controllers/auth');
+var studentController = require('./controllers/student');
+var instructorController = require('./controllers/instructor');
+var courseController = require('./controllers/course');
+var generateController = require('./controllers/generate');
+
 // app.use(function (req, res, next) {
 //   res.header("Access-Control-Allow-Origin", "*");
 //   res.header("Access-Control-Allow-Headers", "*");
 //   next();
 // });
 
-app.use(cookieSession({
-  name: 'session',
-  keys: ['I', 'Love', 'Database','userID','isLogin','userType'],
+// app.use(cookieSession({
+//   name: 'session',
+//   keys: ['I', 'Love', 'Database','userID','isLogin','userType'],
 
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+//   // Cookie Options
+//   maxAge: 24 * 60 * 60 * 1000 // 24 hours
+// }))
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -62,12 +65,6 @@ app.use(function (req, res, next) {
   next(err);
 });
 
-app.set('trust proxy',1);
-app.use(cookieSession({
-  name:'session',
-  keys:['userID', 'isLogin'],
-  maxAge: 24 * 60 * 60 * 1000
-}));
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
