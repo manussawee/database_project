@@ -403,6 +403,13 @@ router.get('/data', function (req, res) {
     "insert into students values ('1409901439999', 'Manussawee Tepakidareekul', '5831057021', '123456', 'Computer Olympiad', '1', '21', '13')",
     // undergrad_students
     "insert into undergrad_students values ('5831057021', 3, '2019-06-01 00:00:00')",
+    // register
+    "insert into register values ('2110318', '1', '2017', '2', '5831057021', null)",
+    "insert into register values ('2110332', '1', '2017', '2', '5831057021', null)",
+    "insert into register values ('2110413', '1', '2017', '2', '5831057021', null)",
+    "insert into register values ('2110471', '1', '2017', '2', '5831057021', null)",
+    "insert into register values ('3904205', '1', '2017', '2', '5831057021', null)",
+    "insert into register values ('5500308', '1', '2017', '2', '5831057021', null)",
   ];
 
   const promises = queries.map(query => {
