@@ -94,7 +94,7 @@ router.get('/database', function (req, res, next) {
     "create table `requests` (\
       `request_id` int not null auto_increment,\
       `student_id` varchar(32) not null,\
-      `type` enum('transcript', 'graduate'),\
+      `type` varchar(32),\
       primary key(`request_id`, `student_id`, `type`)\
     )",
     "create table `buildings` (\
