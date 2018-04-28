@@ -15,7 +15,7 @@ router.post('/student', function(req,res){
 	let is_found = false;
 	let is_grad = false;
 	const query = `SELECT * FROM students\
-	WHERE student_id = ${student_id} AND password = ${password};`;
+	WHERE student_id = '${student_id}' AND password = '${password}'`;
 	mysql.query(query, function(err, result, fields){
 	  if(err) throw err;
 	  else{
@@ -27,7 +27,7 @@ router.post('/student', function(req,res){
 			}
 		  is_found = true;
 		  var query2 = `SELECT * FROM students A RIGHT JOIN grad_students B\
-		    ON A.student_id = B.student_id  WHERE B.student_id = ${student_id}`;
+		    ON A.student_id = B.student_id  WHERE B.student_id = '${student_id}'`;
 		  mysql.query(query2, function(err,result,fields){
         if(err) throw err;
 		    else{
@@ -42,7 +42,7 @@ router.post('/student', function(req,res){
 			    }
 			    if(!is_grad){
 			      var query3 = `SELECT * FROM students A RIGHT JOIN undergrad_students B\
-			        ON A.student_id = B.student_id  WHERE B.student_id = ${student_id}`;
+			        ON A.student_id = B.student_id  WHERE B.student_id = '${student_id}'`;
 			      mysql.query(query3,function(err,result,fields){
 				      if(err) throw err;
 				      else{

@@ -11,9 +11,9 @@ router.get('/', function (req, res, next) {
 
 router.post('/course/grade', function(req, res, next){
   let body = req.body;
-  let query = `UPDATE register SET grade=${body.grade} WHERE course_id=${body.course_id}\
-  AND year=${body.year} AND semester=${body.semester} AND student_id=${body.student_id}
-  AND section_id=${body.section_id}`;
+  let query = `UPDATE register SET grade='${body.grade}' WHERE course_id='${body.course_id}'\
+  AND year='${body.year}' AND semester='${body.semester}' AND student_id='${body.student_id}'
+  AND section_id='${body.section_id}'`;
   mysql.query(query, function(err, result){
     if(err) return res.send('FAIL');
     else return res.send('OK');
@@ -42,7 +42,7 @@ router.get('/advisees',function(req,res){
   
   if(req.session.userType === 'instructor'){
     let userID = req.session.userID;
-    const query = `SELECT * FROM students WHERE advisor_id = ${userID};`;
+    const query = `SELECT * FROM students WHERE advisor_id = '${userID}'`;
     mysql.query(query, function (err, students) {
       if (err) console.error(err);
       else mapStudentRegis(students).then(() => {
@@ -58,7 +58,7 @@ router.get('/advisees',function(req,res){
 router.get('/course/all',function(req,res){
 	if(req.session.userType !== 'instructor') return res.send({});
 	const instructorID = req.session.userID;
-	const query = 'SELECT * FROM (teach NATURAL JOIN (sections NATURAL JOIN time_slots)) NATURAL JOIN courses WHERE instructor_id = ' + instructorID;
+	const query = 'SELECT * FROM (teach NATURAL JOIN (sections NATURAL JOIN time_slots)) NATURAL JOIN courses WHERE instructor_id = "' + instructorID + '"';
 	
 	const promise = new Promise((resolve, reject) => {
 		mysql.query(query, function(err, timeSlots) {

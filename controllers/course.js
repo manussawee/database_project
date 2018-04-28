@@ -62,7 +62,7 @@ router.get('/all', function (req, res, next) {
 
 router.get('/section',function(req,res){
 	let courseID = req.query.course_id;
-	let sql = `SELECT * FROM sections WHERE course_id = ${courseID};`
+	let sql = `SELECT * FROM sections WHERE course_id = '${courseID}'`
     let result = [];
     mysql.query(sql,function(err,sections){
       console.log(sections);
@@ -74,15 +74,15 @@ router.get('/section/student', function(req, res, next){
 	if(!req.session.isLogin) res.send('FAIL');
 	else{
 		let student_info = [];
-		let query = `SELECT student_id FROM register WHERE course_id=${req.query.course_id} \
-		AND section_id=${req.query.section_id} AND year=${req.query.year} AND semester=${req.query.semester}`
+		let query = `SELECT student_id FROM register WHERE course_id = '${req.query.course_id}' \
+		AND section_id = '${req.query.section_id}' AND year = '${req.query.year}' AND semester = '${req.query.semester}'`
 		mysql.query(query, function(err, result1){
 			if(err) return err;
 			else{
 				const promises = result1.map(result => {
 					return new Promise((resolve, reject) => {
 						query = `SELECT * FROM students A RIGHT JOIN grad_students B\
-						ON A.student_id = B.student_id  WHERE B.student_id = ${result.student_id}`;
+						ON A.student_id = B.student_id  WHERE B.student_id = '${result.student_id}'`;
 						mysql.query(query, function(err,grad_student,fields){
 							if(err) reject(err);
 							else{
@@ -94,7 +94,7 @@ router.get('/section/student', function(req, res, next){
 								else{
 									console.log('part3')
 									query = `SELECT * FROM students A RIGHT JOIN undergrad_students B\
-									ON A.student_id = B.student_id  WHERE B.student_id = ${result.student_id}`;
+									ON A.student_id = B.student_id  WHERE B.student_id = '${result.student_id}'`;
 									mysql.query(query,function(err,ungrad_student,fields){
 									if(err) reject(err);
 									else{

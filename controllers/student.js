@@ -47,7 +47,7 @@ router.post('/register/add',function(req,res){
 router.post('/request', function(req, res, next){
   if(!req.session.isLogin || req.session.userType != 'student') res.send('FAIL');
   else{
-    let query = `INSERT INTO requests (student_id, type) VALUES (${req.session.userID.toString()}, '${req.body.type}')`
+    let query = `INSERT INTO requests (student_id, type) VALUES ('${req.session.userID.toString()}', '${req.body.type}')`
     mysql.query(query, function(err, result){
       if(err) return res.send(err);
       else return res.send('OK');
@@ -59,7 +59,7 @@ router.get('/payment', function(req, res, next){
   if(!req.session.isLogin || req.session.userType != 'student') res.send('FAIL');
   else{
     let student_id = req.session.userID.toString();
-    let query = 'SELECT * FROM pay NATURAL JOIN fees WHERE student_id = ' + student_id;
+    let query = 'SELECT * FROM pay NATURAL JOIN fees WHERE student_id = "' + student_id + '"';
     mysql.query(query, (err, result) => {
       if(err) return res.send({});
       return res.send({
@@ -77,8 +77,8 @@ router.post('/register/withdraw', function(req, res, next){
     let year = req.body.year;
     let semester = req.body.semester;
     let student_id = req.session.userID;
-    let query = `UPDATE register SET grade = 'W' WHERE course_id=${course_id} AND section_id=${section_id}\
-    AND year=${year} AND semester=${semester} AND student_id=${student_id}`;
+    let query = `UPDATE register SET grade = 'W' WHERE course_id='${course_id}' AND section_id='${section_id}'\
+    AND year=${year} AND semester='${semester}' AND student_id='${student_id}'`;
     mysql.query(query, function(err, result){
       if(err) return res.send('FAIL');
       else{
@@ -97,15 +97,15 @@ router.post('/register/remove', function(req, res, next){
     let semester = req.body.semester;
     let student_id = req.session.userID;
     console.log(student_id);
-    let query1 = `SELECT * FROM undergrad_students WHERE student_id = ${student_id}`;
+    let query1 = `SELECT * FROM undergrad_students WHERE student_id = '${student_id}'`;
     mysql.query(query1, function(err, result1){
       if(err){
         console.log('NOT IN UNDERGRAD STUDENTS');
         return res.send('FAIL');
       }
       else{
-        let query2 = `DELETE FROM database_project.register WHERE course_id=${course_id} \
-        AND section_id=${section_id} AND year=${year} AND semester=${semester} AND student_id=${student_id};`;
+        let query2 = `DELETE FROM database_project.register WHERE course_id='${course_id}' \
+        AND section_id='${section_id}' AND year='${year}' AND semester='${semester}' AND student_id='${student_id}'`;
         mysql.query(query2, function(err, result2){
           if(err){
             console.log('UNABLE TO REMOVE REGISTERED COURSE');
@@ -122,7 +122,7 @@ router.post('/register/remove', function(req, res, next){
 router.get('/course/all',function(req,res){
 
   const student_id = req.session.userID;
-  const query = 'SELECT * FROM (register NATURAL JOIN (sections NATURAL JOIN time_slots)) NATURAL JOIN courses WHERE student_id = ' + student_id;
+  const query = 'SELECT * FROM (register NATURAL JOIN (sections NATURAL JOIN time_slots)) NATURAL JOIN courses WHERE student_id = "' + student_id + '"';
 
   const promise = new Promise((resolve, reject) => {
     mysql.query(query, function (err, timeSlots) {
@@ -182,7 +182,7 @@ router.get('/course/all',function(req,res){
 router.get('/request',function(req,res){
   if(req.session.userType === 'student'){
     let userID = req.session.userID;
-    let sql = `SELECT * FROM requests WHERE student_id = ${userID};`
+    let sql = `SELECT * FROM requests WHERE student_id = '${userID}'`
     let result = [];
     mysql.query(sql,function(err,requests){
       if (err) res.send({});

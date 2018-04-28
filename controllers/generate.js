@@ -28,8 +28,8 @@ router.get('/database', function (req, res, next) {
       `year` int not null,\
       `semester` int not null,\
       `capacity` int null,\
-      `building_id` int null,\
-      `room_id` int null,\
+      `building_id` varchar(32) null,\
+      `room_id` varchar(32) null,\
       primary key(`course_id`, `section_id`, `year`, `semester`) \
     )",
     "create table `time_slots` (\
