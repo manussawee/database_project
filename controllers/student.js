@@ -150,6 +150,7 @@ router.get('/course/all',function(req,res){
           capacity: timeSlot.capacity,
           building_id: timeSlot.building_id,
           room_id: timeSlot.room_id,
+          grade: timeSlot.grade,
           time_slots: []
         };
         course.sections.push(section);
