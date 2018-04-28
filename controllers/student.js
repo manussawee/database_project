@@ -123,25 +123,22 @@ router.post('/register/remove', function(req, res, next){
 
 //DOES NOT CHECK RAD OR UNDER GRAD
 router.get('/course/all',function(req,res){
-  if(req.session.userType === 'student'){
-    let userID = req.session.userID;
-    let sql = `SELECT course_id, section_id, grade FROM register WHERE student_id = ${userID};`
-    let result = [];
-    mysql.query(sql,function(err,courses){
-      if (err) res.send({});
-      else{
-        courses.map((course,index) =>{
-          result.push(course);
-          console.log(courses.length-1);
-          if(index === courses.length-1) {
-            console.log("OK");
-            res.send({'courses' : result});
-          }
-        });
+
+  const student_id = req.session.userID;
+  console.log(student_id)
+  const query = `select * from register natural join courses where student_id = ${student_id};`
+  	
+	const promise = new Promise((resolve, reject) => {
+		mysql.query(query, function(err, doc) {
+			if (err) {
+        console.log(err);
+        reject(err) 
       }
-    });
-  }
-  else res.send({});
+			else resolve(doc);
+		});
+	});
+	
+	promise.then((doc) => {res.send(doc)}).catch((err) => res.send(err));
 });
 
 router.get('/request',function(req,res){

@@ -22,8 +22,8 @@ router.post('/student', function(req,res){
 			let token = session.generateToken(32);
 			session.tokens[token] = {
 				isLogin: true,
-				userID: req.body.instructor_id,
-				userType: 'instructor',
+				userID: req.body.student_id,
+				userType: 'student',
 			}
 		  is_found = true;
 		  var query2 = `SELECT * FROM students A RIGHT JOIN grad_students B\
