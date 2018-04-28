@@ -36,6 +36,7 @@ router.post('/student', function(req,res){
 						delete result[0].password;
 						res.send({
 							user: result[0],
+							type: 'student',
 							token: token,
 						});
 			    }
@@ -48,6 +49,7 @@ router.post('/student', function(req,res){
 								delete result[0].password;
 								res.send({
 									user: result[0],
+									type: 'student',
 									token: token,
 								});
 				      }
@@ -75,6 +77,7 @@ router.post('/instructor', function (req, res) {
 				delete result[0].password;
 				res.send({
 					user: result[0],
+					type: 'instructor',
 					token: token,
 				});
 			}
@@ -99,7 +102,10 @@ router.get('/check', function (req, res) {
 				if (result.length === 0) res.send({});
 				else {
 					delete result[0].password;
-					res.send({ user: result[0] });
+					res.send({ 
+						user: result[0],
+						type: req.session.userType,
+					});
 				}
 			}
 		});
@@ -109,7 +115,7 @@ router.get('/check', function (req, res) {
 
 router.post('/logout', function (req, res) {
 	if (req.query.token && session.tokens[req.query.token]) {
-		delete tokens[req.query.token];
+		delete session.tokens[req.query.token];
 		res.send({ result: 'OK' });
 	}
 	else res.send({ result: 'ERROR' });
