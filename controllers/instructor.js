@@ -10,15 +10,25 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/course/grade', function(req, res, next){
-  let body = req.body;
-  let query = `UPDATE register SET grade='${body.grade}' WHERE course_id='${body.course_id}'\
-  AND year='${body.year}' AND semester='${body.semester}' AND student_id='${body.student_id}'
-  AND section_id='${body.section_id}'`;
-  mysql.query(query, function(err, result){
-    if(err) return res.send('FAIL');
-    else return res.send('OK');
-  });
+	let body = req.body;
+	mysql.query(`SELECT * FROM teach WHERE course_id='${ body.course_id }' AND year='${ body.year }' AND semester='${ body.semester }' AND section_id = '${body.section_id}'`, (err, result) => {
+		if(err) return res.send('FAIL');
+		else {
+			if(result.length) {
+				let query = `UPDATE register SET grade='${body.grade}' WHERE course_id='${body.course_id}' AND year='${body.year}' AND semester='${body.semester}' AND student_id='${body.student_id}' AND section_id='${body.section_id}'`;
+				mysql.query(query, function (err, result) {
+					if (err) return res.send('FAIL');
+					else {
+						if (result.affectedRows == 0) res.send('STUDENT NOT FOUND');
+						else res.send('OK');
+					}
+				});
+			}
+			else res.send('DENY');
+		}
+	});
 });
+
 router.get('/advisees',function(req,res){
   const mapStudentRegis = (students) => new Promise((resolve, reject) => {
     console.log(students);

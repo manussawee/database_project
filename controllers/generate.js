@@ -402,7 +402,7 @@ router.get('/data', function (req, res) {
     "insert into pay values (1, '5831057021')",
     "insert into pay values (2, '5831057021')",
     // students
-    "insert into students values ('1409901439999', 'Manussawee Tepakidareekul', '5831057021', '123456', 'Computer Olympiad', '1', '21', '13')",
+    "insert into students values ('1409901439999', 'Manussawee Tepakidareekul', '5831057021', '123456', 'Computer Olympiad', 'WKK', '21', '13')",
     // undergrad_students
     "insert into undergrad_students values ('5831057021', 3, '2019-06-01 00:00:00')",
     // register
