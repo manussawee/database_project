@@ -21,7 +21,7 @@ router.post('/register/add',function(req,res){
   mysql.query('SELECT * FROM register WHERE course_id = ? AND year = ? AND semester = ? AND student_id = ?', [
     req.body.course_id, req.body.year, req.body.semester, req.session.userID
   ], (err, result) => {
-    if(result.length > 0) res.send('FAIL');
+    if(result.length > 0) res.send('EXIST');
     else {
       mysql.query(checksql, [req.body.course_id, req.body.section_id, req.body.year, req.body.semester], function (err, result) {
         if (err) console.log("CHECK ERROR");
