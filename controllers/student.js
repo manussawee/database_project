@@ -10,7 +10,7 @@ router.get('/', function (req, res, next) {
 });
 // DOES NOT CHECK GRAD AND UNGRAD
 router.post('/register/add',function(req,res){
-  let checksql = "SELECT * FROM sections \
+  let checksql = "SELECT * FROM sections NATURAL JOIN register \
           WHERE course_id = ? AND\
                 section_id = ? AND\
                 year = ? AND\
@@ -25,7 +25,7 @@ router.post('/register/add',function(req,res){
     else {
       mysql.query(checksql, [req.body.course_id, req.body.section_id, req.body.year, req.body.semester], function (err, result) {
         if (err) console.log("CHECK ERROR");
-        else if (result.lenght === 0) res.send("NOT FOUND COURSE");
+        else if (result.length && result[0].capacity <= result.length) res.send("SECTION FULL");
         else {
           mysql.query(sql, [req.body.course_id, req.body.section_id, req.body.year, req.body.semester, req.session.userID], function (err, result) {
             if (req.session.userType === 'student') {
