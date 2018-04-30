@@ -11,7 +11,7 @@ router.get('/', function (req, res, next) {
 
 router.post('/course/grade', function(req, res, next){
 	let body = req.body;
-	mysql.query(`SELECT * FROM teach WHERE course_id='${ body.course_id }' AND year='${ body.year }' AND semester='${ body.semester }' AND section_id = '${body.section_id}'`, (err, result) => {
+	mysql.query(`SELECT * FROM teach WHERE course_id='${ body.course_id }' AND year='${ body.year }' AND semester='${ body.semester }' AND section_id = '${body.section_id}' AND instructor_id = '${req.session.userID}'`, (err, result) => {
 		if(err) return res.send('FAIL');
 		else {
 			if(result.length) {

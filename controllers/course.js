@@ -70,6 +70,7 @@ router.get('/section',function(req,res){
 	  else  res.send({'sections' : sections});
     });
 });
+
 router.get('/section/student', function(req, res, next){
 	if(!req.session.isLogin) res.send('FAIL');
 	else{
