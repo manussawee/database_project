@@ -46,12 +46,15 @@ router.post('/student', function(req,res){
 			      mysql.query(query3,function(err,result,fields){
 				      if(err) throw err;
 				      else{
-								delete result[0].password;
-								res.send({
-									user: result[0],
-									type: 'student',
-									token: token,
-								});
+								if(result.length) {
+									delete result[0].password;
+									res.send({
+										user: result[0],
+										type: 'student',
+										token: token,
+									});
+								}
+								else res.send({});
 				      }
 			      });
 			    }
