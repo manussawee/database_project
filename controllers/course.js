@@ -3,7 +3,7 @@ var router = express.Router();
 var mysql = require('../config/mysql');
 
 router.get('/all', function (req, res, next) {
-	const query = 'SELECT * FROM (teach NATURAL JOIN (sections NATURAL JOIN time_slots)) NATURAL JOIN courses';
+	const query = 'SELECT * FROM (sections NATURAL JOIN time_slots) NATURAL JOIN courses';
 
 	const promise = new Promise((resolve, reject) => {
 		mysql.query(query, function (err, timeSlots) {
@@ -18,8 +18,8 @@ router.get('/all', function (req, res, next) {
 
 		timeSlots.map(timeSlot => {
 
-			let course = courses.find((course) => course.course_id === timeSlot.course_id);
-			if (course === undefined) {
+			let course = courses.find((course) => course.course_id == timeSlot.course_id);
+			if (course == undefined) {
 				course = {
 					course_id: timeSlot.course_id,
 					name: timeSlot.name,
@@ -30,8 +30,8 @@ router.get('/all', function (req, res, next) {
 				courses.push(course);
 			}
 
-			let section = course.sections.find(section => section.section_id === timeSlot.section_id);
-			if (section === undefined) {
+			let section = course.sections.find(section => section.section_id == timeSlot.section_id);
+			if (section == undefined) {
 				section = {
 					section_id: timeSlot.section_id,
 					year: timeSlot.year,
@@ -51,7 +51,7 @@ router.get('/all', function (req, res, next) {
 				end_time: timeSlot.end_time,
 			});
 		});
-
+		
 		res.send({ courses: courses });
 	}).catch(err => {
 		console.log(err);

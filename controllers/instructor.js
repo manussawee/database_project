@@ -31,7 +31,7 @@ router.post('/course/grade', function (req, res, next) {
 
 router.get('/advisees', function (req, res) {
 	const mapStudentRegis = (students) => new Promise((resolve, reject) => {
-		console.log(students);
+
 		const promises = students.map((student) => {
 			return new Promise((resolve, reject) => {
 				let queryRegis = 'SELECT * FROM register R RIGHT JOIN courses C ON R.course_id = C.course_id WHERE student_id = ?';
@@ -56,6 +56,7 @@ router.get('/advisees', function (req, res) {
 		mysql.query(query, function (err, students) {
 			if (err) console.error(err);
 			else mapStudentRegis(students).then(() => {
+
 				res.send({ students: students });
 			}).catch((err) => {
 				res.send({});
